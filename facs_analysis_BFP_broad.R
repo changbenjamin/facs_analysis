@@ -7,7 +7,7 @@ library('dplyr')
 library('broom')
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/benjaminchang/Desktop/Collins Lab/GH162-211 Flow/2023-02-13_initial_test_at_Broad/Controls"
+dir="/Users/benjaminchang/Desktop/Collins Lab/GH162-211 Flow/2023-02-13_initial_test_at_Broad/Samples"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -43,10 +43,10 @@ dev.off()
 
 # define gate for singlets (ADJUST PARAMETERS ACCORDINGLY)
 #gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
-g.singlets <- polygonGate(filterId = "Singlets","FSC.Width"=c(1000,3e3,3e3,1000),"FSC.H"=c(3e5,3e5,7e3,7e3))
+g.singlets <- polygonGate(filterId = "Singlets","FSC.Width"=c(1000,3e3,3e3,1000),"FSC.H"=c(1.5e5,1.5e5,3e4,3e4))
 gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
-ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 200)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(5e3,1e6),y=c(250,5e3))) + scale_x_log10() + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 200)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(3e4,1.5e5),y=c(250,1e4))) + scale_x_log10() + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
 pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 10,height = 10)
