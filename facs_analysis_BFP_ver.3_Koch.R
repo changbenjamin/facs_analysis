@@ -152,7 +152,7 @@ for (i in 1:length(rownames(pData(fs_gated)))){
   }}
 results$sample=(results %>% tidyr::separate(sample,c('sp','number','well_2c','well',extra='drop')) %>% select('well'))[,1]
 
-p1=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + ylim(0,10)
+p1=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 p1
 
 #save the plot
