@@ -29,12 +29,7 @@ pData(fs)$name=names1[,1]
 gs <- GatingSet(fs)
 
 # define gate for live cells (ADJUST PARAMETERS ACCORDINGLY)
-#g.live <- polygonGate(filterId = "Live","FSC.A"=c(155000,450000,205000,70000),"SSC.A"=c(1e6,5e6,45000,25000))
-#gs_pop_add(gs,g.live,parent="root") # add gate to GatingSet
-#recompute(gs) # recompute GatingSet
-
-#### LIVE TEST GATE ####
-g.live <- polygonGate(filterId = "Live","FSC.A"=c(1,5e5,5e5,1),"SSC.A"=c(5e6,5e6,1,1))
+g.live <- polygonGate(filterId = "Live","FSC.A"=c(155000,450000,205000,70000),"SSC.A"=c(1e6,5e6,45000,25000))
 gs_pop_add(gs,g.live,parent="root") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 
@@ -53,15 +48,6 @@ gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 200)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(5e3,1e6),y=c(250,5e3))) + scale_x_log10() + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
-
-### TEST GATE #####
-#gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
-g.singlets <- polygonGate(filterId = "Singlets","FSC.Width"=c(1000,3e3,3e3,1000),"FSC.H"=c(3e5,3e5,7e3,7e3))
-gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
-recompute(gs) # recompute GatingSet
-ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 200)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(5e3,1e6),y=c(250,5e3))) + scale_x_log10() + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
-
-
 #save plot
 pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 10,height = 10)
 autoplot(gs,gate = 'Singlets')
@@ -73,16 +59,6 @@ g.singlets2 <- polygonGate(filterId = "Singlets2","FSC.A"=c(5e4,2.5e5,2.5e5,5e4)
 gs_pop_add(gs,g.singlets2,parent="Singlets") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Singlets")+geom_hex(bins = 200)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(1,5e5),y=c(1e4,1e6))) + scale_y_log10() + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
-
-
-### TEST GATE ####
-#gs_pop_remove(gs, node="testg")  ######## VARIABLE ##########
-g.testg <- polygonGate(filterId = "testg","FSC.A"=c(5e4,2.5e5,2.5e5,5e4),"FSC.H"=c(3e5,3e5,3e4,3e4))
-gs_pop_add(gs,testg,parent="Live") # add gate to GatingSet
-recompute(gs) # recompute GatingSet
-ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Live")+geom_hex(bins = 200)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(1,5e5),y=c(1e4,1e6))) + scale_y_log10() + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
-
-
 
 #save plot
 pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 10,height = 10)
