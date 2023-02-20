@@ -7,7 +7,7 @@ library('dplyr')
 library('broom')
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/benjaminchang/Desktop/Collins Lab/GH162-211 Flow/2023-02-06-GH164-GH220-hits-300ng-72hrs/Controls"
+dir="/Users/benjaminchang/Desktop/Collins Lab/Flow Files/2022-11-14_lib3_hits_GH41_to_GH60_72hrs_300ng/Controls"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T)
 as.data.frame(pData(fs)$name)
@@ -22,6 +22,7 @@ print(colnames(fs))
 
 #change column names for ease of use
 colnames(fs)[colnames(fs)=="Pacific.Blue.A"] <- "BFP"
+colnames(fs)[colnames(fs)=="FITC.A"] <- "GFP"
 colnames(fs)[colnames(fs)=="PE.TxRed.YG.A"] <- "mCherry"
 colnames(fs)[colnames(fs)=='SSC.A']='SSC-A'
 
@@ -67,51 +68,51 @@ print(nrow(fs_gated))
 ############ CHECKPOINT 2 ################
 
 # define constitutive reporter gate (BFP)
-#get gated data for postive and negative controls
+#get gated data for positive and negative controls
 df_pos=as.data.frame(exprs(fs_gated[[pos_c]]))
 df_neg=as.data.frame(exprs(fs_gated[[neg_c]]))
 
 print(df_pos)
 
 # coarsely fit a non-linear model for range evaluation
-model <- loess(mCherry ~ BFP, data = df_pos, span = 0.75)
+model <- loess(mCherry ~ GFP, data = df_pos, span = 0.75)
 df_pos <- augment(model, df_pos)
-model <- loess(mCherry ~ BFP, data = df_neg, span = 0.75)
+model <- loess(mCherry ~ GFP, data = df_neg, span = 0.75)
 df_neg <- augment(model, df_neg)
 
 #change values of xlim to evaluated the best reporter expression range
 # FOR THE USER RUNNING THE CODE, the numbers in front of xlim could be set depending on the x-axis range you want to see
-ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue') + xlim(0,100000)
+ggplot(df_neg,aes(GFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=GFP,.fitted),color='blue') + xlim(0,100000)
 
 #save plot
 pdf(file=paste(dir,"model_test_to_set_reporter_range.pdf",sep=""),width = 10,height = 10)
-ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue') + xlim(0,100000)
+ggplot(df_neg,aes(GFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=GFP,.fitted),color='blue') + xlim(0,100000)
 dev.off()
 
 #set the reporter range for the gate
 #you should manually put the range in Shiva!
 # FOR THE USER RUNNING THE CODE you MUST put in the range that defines the bin for the data that will be analyzed! IMPORTANT!
 #The (250, 80k) is for 300 ng per well of 48-well.
-g.bfp <- rectangleGate(filterId="BFP_pos",BFP=c(250,20000))
+g.gfp <- rectangleGate(filterId="GFP_pos",GFP=c(250,20000))
 # check gate
-gs_pop_add(gs,g.bfp,parent="Singlets") # add gate to GatingSet
+gs_pop_add(gs,g.gfp,parent="Singlets") # add gate to GatingSet
 recompute(gs) # recalculate Gatingset
-ggcyto(gs,aes(x=BFP),subset="Singlets",)+geom_density(fill="forestgreen")+geom_gate("BFP_pos")+ geom_stats(adjust = 0.1,y=0.002,digits = 1)+ggcyto_par_set(limits = "instrument")+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
+ggcyto(gs,aes(x=GFP),subset="Singlets",)+geom_density(fill="forestgreen")+geom_gate("GFP_pos")+ geom_stats(adjust = 0.1,y=0.002,digits = 1)+ggcyto_par_set(limits = "instrument")+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
 
 
 #subset flowset to gated population
-fs_gated=getData(gs,'BFP_pos')
+fs_gated=getData(gs,'GFP_pos')
 
 gs#repeat model fit for gate selection confirmation
 df_pos=as.data.frame(exprs(fs_gated[[pos_c]]))
 df_neg=as.data.frame(exprs(fs_gated[[neg_c]]))
 
 # coarsely fit a non-linear model for range evaluation
-model <- loess(mCherry ~ BFP, data = df_pos, span = 0.75)
+model <- loess(mCherry ~ GFP, data = df_pos, span = 0.75)
 df_pos <- augment(model, df_pos)
-model <- loess(mCherry ~ BFP, data = df_neg, span = 0.75)
+model <- loess(mCherry ~ GFP, data = df_neg, span = 0.75)
 df_neg <- augment(model, df_neg)
-ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue')
+ggplot(df_neg,aes(GFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=GFP,.fitted),color='blue')
 
 
 #get gating stats
@@ -122,11 +123,11 @@ ps %>% select(Name,Population,Count,ParentCount,percent_of_parent) %>% kable
 
 #save plot
 pdf(file=paste(dir,"reporter_gate.pdf",sep=""),width = 10,height = 10)
-ggcyto(gs,aes(x=BFP),subset="Singlets",)+geom_density(fill="blue")+geom_gate("BFP_pos")+ geom_stats(adjust = 0.1,y=0.002,digits = 1)+ggcyto_par_set(limits = "instrument")+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
+ggcyto(gs,aes(x=GFP),subset="Singlets",)+geom_density(fill="blue")+geom_gate("GFP_pos")+ geom_stats(adjust = 0.1,y=0.002,digits = 1)+ggcyto_par_set(limits = "instrument")+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
 dev.off()
 
 #subset flowset to gated population
-fs_gated=getData(gs,'BFP_pos')
+fs_gated=getData(gs,'GFP_pos')
 
 #get data for final gated population, remove negative mCherry values. Median (not mean) is computed and plotted for all samples
 results=data.frame()
@@ -135,7 +136,7 @@ results=data.frame()
 
 FITC_col <- which(colnames(fs_gated) == "FITC.A")
 mCherry_col <- which(colnames(fs_gated) == "mCherry")
-BFP_col <- which(colnames(fs_gated) == "BFP")
+GFP_col <- which(colnames(fs_gated) == "GFP")
 
 for (i in 1:length(rownames(pData(fs_gated)))){
   df=as.data.frame(exprs(fs_gated[[i]]))
@@ -145,14 +146,14 @@ for (i in 1:length(rownames(pData(fs_gated)))){
     next
   } else {
     print(df)
-    df=df[,c(FITC_col,BFP_col,mCherry_col)]
+    df=df[,c(GFP_col,mCherry_col)]
     print(df)
     df$sample=rownames(pData(fs_gated[i]))
     results=rbind(results,df)
   }}
 results$sample=(results %>% tidyr::separate(sample,c('sp','number','well_2c','well',extra='drop')) %>% select('well'))[,1]
 
-p1=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+p1=ggplot(results,aes(x=sample,y=mCherry/GFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 p1
 
 #save the plot
