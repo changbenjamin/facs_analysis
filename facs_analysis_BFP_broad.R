@@ -131,7 +131,7 @@ fs_gated=gs_pop_get_data(gs,'BFP_pos')
 mCherry_col <- which(colnames(fs_gated) == "mCherry")
 BFP_col <- which(colnames(fs_gated) == "BFP")
 
-#get data for final gated population, remove negative mCHerry values. Median (not mean) is computed and plotted for all samples
+#get data for final gated population, remove negative mCherry values. Median (not mean) is computed and plotted for all samples
 results=data.frame()
 for (i in 1:length(rownames(pData(fs_gated)))){
   df=as.data.frame(exprs(fs_gated[[i]]))
