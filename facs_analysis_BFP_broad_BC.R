@@ -28,9 +28,9 @@ pData(fs)$name=names1[,1]
 
 gs <- GatingSet(fs)
 
-coor1 <- c(28e4, 0)
-coor2 <- c(25e4, 3e4)
-coor3 <- c(22e4, 10e4)
+coor1 <- c(29e4, 0)
+coor2 <- c(26e4, 3e4)
+coor3 <- c(23e4, 10e4)
 coor4 <- c(30e4, 20e4)
 coor5 <- c(80e4, 47e4)
 coor6 <- c(90e4, 42e4)
@@ -43,8 +43,8 @@ g.live <- polygonGate(filterId = "Live","FSC.A"=c(coor1[1],coor2[1],coor3[1],coo
 gs_pop_add(gs,g.live,parent="root") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 
-#check gate
-out_live <- ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 4096)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(-10,1e6),y=c(-10,1e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+#check gate - lower bins = less processing power required
+out_live <- ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 2048)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(-10,1e6),y=c(-10,1e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 out_live
 # ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,5e6),y=c(-10,5e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
@@ -56,34 +56,46 @@ dev.off()
 
 ############# LIVE CHECKPOINT #############
 
+coor1 <- c(200e3, 140e1)
+coor2 <- c(170e3, 170e1)
+coor3 <- c(200e3, 220e1)
+coor4 <- c(260e3, 250e1)
+coor5 <- c(340e3, 2500)
+coor6 <- c(380e3, 2250)
+coor7 <- c(375e3, 1800)
+coor8 <- c(260e3, 1350)
+
+
+
 
 # define gate for singlets (ADJUST PARAMETERS ACCORDINGLY)
-#gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
-#g.singlets <- polygonGate(filterId = "Singlets","FSC.Width"=c(coord1[1],coord2[1],coord3[1],coord4[1]),"FSC.H"=c(coord1[2],coord2[2],coord3[2],coord4[2]))
-#gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
-#recompute(gs) # recompute GatingSet
-#ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 200)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(3e4,1e6),y=c(250,1e4)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
+g.singlets <- polygonGate(filterId = "Singlets","FSC.H"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"FSC.Width"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
+gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
+recompute(gs) # recompute GatingSet
+singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-#pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 10,height = 10)
-#autoplot(gs,gate = 'Singlets')
-#dev.off()
+pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 60,height = 10)
+singlet_out
+dev.off()
 
-coord1 <- c(10e4, 0)
-coord2 <- c(0, 50e3)
-coord3 <- c(50e4, 400e3)
-coord4 <- c(90e4, 400e3)
+coord1 <- c(19e4, 105e3)
+coord2 <- c(7e4, 170e3)
+coord3 <- c(59e4, 345e3)
+coord4 <- c(75e4, 310e3)
 
 # define gate for singlets2 (ADJUST PARAMETERS ACCORDINGLY)
-#gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
+gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
 g.singlets2 <- polygonGate(filterId = "Singlets2","FSC.A"=c(coord1[1],coord2[1],coord3[1],coord4[1]),"FSC.H"=c(coord1[2],coord2[2],coord3[2],coord4[2]))
-gs_pop_add(gs,g.singlets2,parent="Live") # add gate to GatingSet
+gs_pop_add(gs,g.singlets2,parent="Singlets") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
-ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Live")+geom_hex(bins = 200)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(1,2e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+singlet2_out <- ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Singlets")+geom_hex(bins = 256)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(1,2e6),y=c(1e4,4e5))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+singlet2_out
 
 #save plot
-pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 10,height = 10)
-autoplot(gs,gate = 'Singlets2')
+pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 60,height = 10)
+singlet2_out
 dev.off()
 
 ############# SINGLETS CHECKPOINT #############
@@ -104,10 +116,10 @@ df_neg <- augment(model, df_neg)
 
 #change values of xlim to evaluated the best reporter expression range
 # FOR THE USER RUNNING THE CODE, the numbers in front of xlim could be set depending on the x-axis range you want to see
-ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue') + xlim(250,80000)
+bfp_reporter_range <- ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue') + xlim(250,80000)
 #save plot
 pdf(file=paste(dir,"model_test_to_set_reporter_range.pdf",sep=""),width = 10,height = 10)
-ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue') + xlim(250,80000)
+bfp_reporter_range
 dev.off()
 
 # 
