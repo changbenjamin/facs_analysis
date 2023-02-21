@@ -7,7 +7,7 @@ library('dplyr')
 library('broom')
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/benjaminchang/Desktop/Collins Lab/Flow Files/Exp_20230217_2/Controls"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-20/Exp_20230220_1/subset/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -16,7 +16,7 @@ as.data.frame(pData(fs)$name)
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
 pos_c=1
-neg_c=2
+neg_c=3
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -28,23 +28,29 @@ pData(fs)$name=names1[,1]
 
 gs <- GatingSet(fs)
 
-coor1 <- c(25e4, 0)
-coor2 <- c(20e4, 10e4)
-coor3 <- c(30e4, 20e4)
-coor4 <- c(80e4, 50e4)
-coor5 <- c(90e4, 10e4)
+coor1 <- c(28e4, 0)
+coor2 <- c(25e4, 3e4)
+coor3 <- c(22e4, 10e4)
+coor4 <- c(30e4, 20e4)
+coor5 <- c(80e4, 47e4)
+coor6 <- c(90e4, 42e4)
+coor7 <- c(95e4, 20e4)
+coor8 <- c(45e4, 3e4)
 
 # define gate for live cells (ADJUST PARAMETERS ACCORDINGLY)
-g.live <- polygonGate(filterId = "Live","FSC.A"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2]))
+gs_pop_remove(gs, node='Live')
+g.live <- polygonGate(filterId = "Live","FSC.A"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
 gs_pop_add(gs,g.live,parent="root") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 
 #check gate
-ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,5e6),y=c(-10,5e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+out_live <- ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 4096)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(-10,1e6),y=c(-10,1e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+out_live
+# ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,5e6),y=c(-10,5e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 10,height = 10)
-ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(-10,1e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 60,height = 10)
+out_live
 dev.off()
 
 
