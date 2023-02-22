@@ -7,7 +7,7 @@ library('dplyr')
 library('broom')
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-21/Exp_20230221_1/"
+dir="/Users/benjaminchang/Desktop/Collins Lab/Flow Files/2023-02-21/Exp_20230221_1/Controls"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -15,8 +15,8 @@ as.data.frame(pData(fs)$name)
 #select positive and negative samples from table above
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
-pos_c=78
-neg_c=84
+pos_c=1
+neg_c=2
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -38,7 +38,7 @@ coor7 <- c(95e4, 20e4)
 coor8 <- c(45e4, 3e4)
 
 # define gate for live cells (ADJUST PARAMETERS ACCORDINGLY)
-gs_pop_remove(gs, node='Live')
+#gs_pop_remove(gs, node='Live')
 g.live <- polygonGate(filterId = "Live","FSC.A"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
 gs_pop_add(gs,g.live,parent="root") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
@@ -69,7 +69,7 @@ coor8 <- c(260e3, 1350)
 
 
 # define gate for singlets (ADJUST PARAMETERS ACCORDINGLY)
-gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
+#gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
 g.singlets <- polygonGate(filterId = "Singlets","FSC.H"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"FSC.Width"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
 gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
@@ -86,7 +86,7 @@ coord3 <- c(59e4, 345e3)
 coord4 <- c(75e4, 310e3)
 
 # define gate for singlets2 (ADJUST PARAMETERS ACCORDINGLY)
-gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
+#gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
 g.singlets2 <- polygonGate(filterId = "Singlets2","FSC.A"=c(coord1[1],coord2[1],coord3[1],coord4[1]),"FSC.H"=c(coord1[2],coord2[2],coord3[2],coord4[2]))
 gs_pop_add(gs,g.singlets2,parent="Singlets") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
@@ -127,12 +127,12 @@ dev.off()
 #you should manually put the range in Shiva!
 # FOR THE USER RUNNING THE CODE you MUST put in the range that defines the bin for the data that will be analyzed! IMPORTANT!
 #The (250, 80k) is for 300 ng per well of 48-well.
-gs_pop_remove(gs, node="BFP_pos")
+#gs_pop_remove(gs, node="BFP_pos")
 g.bfp <- rectangleGate(filterId="BFP_pos",BFP=c(500,1e6))
 # check gate
 gs_pop_add(gs,g.bfp,parent="Singlets2") # add gate to GatingSet
 recompute(gs) # recalculate Gatingset
-BFP_hist <- ggcyto(gs,aes(x=BFP),subset="Singlets2",)+geom_density(fill="forestgreen")+geom_gate("BFP_pos")+ geom_stats(adjust = 0.1,digits = 1)+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
+BFP_hist <- ggcyto(gs,aes(x=BFP),subset="Singlets2",)+geom_density(fill="skyblue")+geom_gate("BFP_pos")+ geom_stats(adjust = 0.1,digits = 1)+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
 BFP_hist
 #save plot
 pdf(file=paste(dir,"reporter_gate.pdf",sep=""),width = 10,height = 10)
