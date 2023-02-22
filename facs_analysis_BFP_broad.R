@@ -66,8 +66,6 @@ coor7 <- c(375e3, 1800)
 coor8 <- c(260e3, 1350)
 
 
-
-
 # define gate for singlets (ADJUST PARAMETERS ACCORDINGLY)
 #gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
 g.singlets <- polygonGate(filterId = "Singlets","FSC.H"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"FSC.Width"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
@@ -189,8 +187,7 @@ dev.off()
 
 
 
-
-
+######################## FINAL CHECKPOINT ########################
 
 
 
