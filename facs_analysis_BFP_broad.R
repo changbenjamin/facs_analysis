@@ -234,17 +234,17 @@ pdf(file=paste(dir,"single_sample_induction_boxplot.pdf",sep=""),width = 10,heig
 p1
 dev.off()
 
-BFP_counts <- gating_rep[gating_rep$Population == '/Live/Singlets/Singlets2/BFP_pos']$Count
+BFP_pos <- gating_rep[gating_rep$Population == '/Live/Singlets/Singlets2/BFP_pos']$Count
 
 Total_counts <- gating_rep[gating_rep$Population == '/Live']$Count
-Singlet_counts <- gating_rep[gating_rep$Population == '/Live/Singlets/Singlets2']$Count
+Singlets <- gating_rep[gating_rep$Population == '/Live/Singlets/Singlets2']$Count
 Live_percent <- 100*gating_rep[gating_rep$Population == '/Live']$percent_of_parent
 BFP_percent <- 100*gating_rep[gating_rep$Population == '/Live/Singlets/Singlets2/BFP_pos']$percent_of_parent
 
 p2=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 data_stats=as.data.frame(ggplot_build(p2)$data[[1]][,1:5])
 rownames(data_stats)=sort(unique(p1$data$sample))
-data_stats <- cbind(data_stats, BFP_counts, Total_counts, Singlet_counts, Live_percent, BFP_percent)
+data_stats <- cbind(data_stats, BFP_pos, Total_counts, Singlets, Live_percent, BFP_percent)
 
 data_stats
 
