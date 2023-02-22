@@ -7,7 +7,7 @@ library('dplyr')
 library('broom')
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-17_re-confirmation/Exp_20230217_2/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-21/Exp_20230221_1/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -15,8 +15,8 @@ as.data.frame(pData(fs)$name)
 #select positive and negative samples from table above
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
-pos_c=6
-neg_c=12
+pos_c=78
+neg_c=84
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -175,7 +175,27 @@ model <- loess(mCherry ~ BFP, data = df_pos, span = 0.75)
 df_pos <- augment(model, df_pos)
 model <- loess(mCherry ~ BFP, data = df_neg, span = 0.75)
 df_neg <- augment(model, df_neg)
-ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue')
+final_model <- ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue')
+final_model
+
+pdf(file=paste(dir,"updated_reporter_model.pdf",sep=""),width = 10,height = 10)
+final_model
+dev.off()
+# make sure the model looks right, before proceeding.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #get gating stats
@@ -216,7 +236,7 @@ dev.off()
 
 
 p2=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
-data_stats=as.data.frame(ggplot_build(hp2)$data[[1]][,1:5])
+data_stats=as.data.frame(ggplot_build(p2)$data[[1]][,1:5])
 rownames(data_stats)=sort(unique(p1$data$sample))
 
 data_stats
