@@ -7,7 +7,7 @@ library('dplyr')
 library('broom')
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-20/Exp_20230220_1/subset/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-20/Exp_20230220_1/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -15,8 +15,8 @@ as.data.frame(pData(fs)$name)
 #select positive and negative samples from table above
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
-pos_c=1
-neg_c=3
+pos_c=2
+neg_c=4
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -150,7 +150,7 @@ coor7 <- c(8e5, 35e4)
 coor8 <- c(5e5, 2.5e4)
 coor9 <- c(2.7e3, 1e4)
 
-#gs_pop_remove(gs, node="BFP_pos")  ######## VARIABLE ##########
+gs_pop_remove(gs, node="BFP_pos")  ######## VARIABLE ##########
 g.bfp <- polygonGate(filterId = "BFP_pos","BFP"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1],coor9[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2],coor9[2]))
 gs_pop_add(gs,g.bfp,parent="Singlets2") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
