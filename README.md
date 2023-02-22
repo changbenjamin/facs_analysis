@@ -8,15 +8,15 @@ To run the code, you need to have R and the following libraries installed: flowC
 
 ## Running the code
 
-1. Open the R console and set the working directory to the location of the script.
-2. Modify the directory path in the code to specify the location of the fcs files.
-3. Run the script.
-4. The script will generate several plots, which will be saved as pdf files in the same directory.
-5. The final plot will show the expression of the constitutive reporter gene, BFP, in each sample. This plot can be used to compare the reporter gene expression across different samples.
+1. Choose the correct script to run based on the instrument used
+2. Open the R console and set the working directory to the location of the script.
+3. Modify the directory path in the code to specify the location of the fcs files.
+4. Run the script.
+5. The script will generate a CSV file and several plots, which will be saved as pdf files in the same directory.
 
 ## Output
 
-The script generates several plots and a CSV file containing fluorescence and gating statistics, with the number and percentage of cells in relevant gates. The plots show gates and the expression of the constitutive reporter gene, BFP, in each sample.
+The script outputs several plots and a CSV file containing fluorescence and gating statistics, with the number and percentage of cells in relevant gates. The plots show gates and the expression of the constitutive reporter gene in each sample.
 
 ## Notes
 
