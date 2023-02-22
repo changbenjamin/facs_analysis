@@ -7,7 +7,7 @@ library('dplyr')
 library('broom')
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-20/Exp_20230220_1/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-17_re-confirmation/Exp_20230217_2/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -15,8 +15,8 @@ as.data.frame(pData(fs)$name)
 #select positive and negative samples from table above
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
-pos_c=2
-neg_c=4
+pos_c=6
+neg_c=12
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -49,7 +49,7 @@ out_live
 # ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,5e6),y=c(-10,5e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 60,height = 10)
+pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 10,height = 10)
 out_live
 dev.off()
 
@@ -76,7 +76,7 @@ recompute(gs) # recompute GatingSet
 singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 60,height = 10)
+pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 10,height = 10)
 singlet_out
 dev.off()
 
@@ -94,7 +94,7 @@ singlet2_out <- ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Singlets")+geom_hex(bins 
 singlet2_out
 
 #save plot
-pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 60,height = 10)
+pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 10,height = 10)
 singlet2_out
 dev.off()
 
@@ -123,43 +123,43 @@ bfp_reporter_range
 dev.off()
 
 # 
-# #set the reporter range for the gate
-# #you should manually put the range in Shiva!
-# # FOR THE USER RUNNING THE CODE you MUST put in the range that defines the bin for the data that will be analyzed! IMPORTANT!
-# #The (250, 80k) is for 300 ng per well of 48-well.
-# #gs_pop_remove(gs, node="BFP_pos")
-# g.bfp <- rectangleGate(filterId="BFP_pos",BFP=c(300,1e6))
-# # check gate
-# gs_pop_add(gs,g.bfp,parent="Singlets2") # add gate to GatingSet
-# recompute(gs) # recalculate Gatingset
-# BFP_hist <- ggcyto(gs,aes(x=BFP),subset="Singlets2",)+geom_density(fill="forestgreen")+geom_gate("BFP_pos")+ geom_stats(adjust = 0.1,digits = 1)+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
-# BFP_hist
-# #save plot
-# pdf(file=paste(dir,"reporter_gate.pdf",sep=""),width = 60,height = 10)
-# BFP_hist
-# dev.off()
-
-
-coor1 <- c(685, 3.7e4)
-coor2 <- c(535, 15e4)
-coor3 <- c(635, 32e4)
-coor4 <- c(1000, 42e4)
-coor5 <- c(1e4, 52e4)
-coor6 <- c(1.8e5, 51e4)
-coor7 <- c(8e5, 35e4)
-coor8 <- c(5e5, 2.5e4)
-coor9 <- c(2.7e3, 1e4)
-
-gs_pop_remove(gs, node="BFP_pos")  ######## VARIABLE ##########
-g.bfp <- polygonGate(filterId = "BFP_pos","BFP"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1],coor9[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2],coor9[2]))
+#set the reporter range for the gate
+#you should manually put the range in Shiva!
+# FOR THE USER RUNNING THE CODE you MUST put in the range that defines the bin for the data that will be analyzed! IMPORTANT!
+#The (250, 80k) is for 300 ng per well of 48-well.
+gs_pop_remove(gs, node="BFP_pos")
+g.bfp <- rectangleGate(filterId="BFP_pos",BFP=c(500,1e6))
+# check gate
 gs_pop_add(gs,g.bfp,parent="Singlets2") # add gate to GatingSet
-recompute(gs) # recompute GatingSet
-bfp_dots <-ggcyto(gs,aes(x=BFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 200)+geom_gate(g.bfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
-
+recompute(gs) # recalculate Gatingset
+BFP_hist <- ggcyto(gs,aes(x=BFP),subset="Singlets2",)+geom_density(fill="forestgreen")+geom_gate("BFP_pos")+ geom_stats(adjust = 0.1,digits = 1)+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
+BFP_hist
 #save plot
-pdf(file=paste(dir,"BFP_dots_gate.pdf",sep=""),width = 60,height = 10)
-bfp_dots
+pdf(file=paste(dir,"reporter_gate.pdf",sep=""),width = 10,height = 10)
+BFP_hist
 dev.off()
+
+
+# coor1 <- c(685, 3.7e4)
+# coor2 <- c(535, 15e4)
+# coor3 <- c(635, 32e4)
+# coor4 <- c(1000, 42e4)
+# coor5 <- c(1e4, 52e4)
+# coor6 <- c(1.8e5, 51e4)
+# coor7 <- c(8e5, 35e4)
+# coor8 <- c(5e5, 2.5e4)
+# coor9 <- c(2.7e3, 1e4)
+# 
+# gs_pop_remove(gs, node="BFP_pos")  ######## VARIABLE ##########
+# g.bfp <- polygonGate(filterId = "BFP_pos","BFP"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1],coor9[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2],coor9[2]))
+# gs_pop_add(gs,g.bfp,parent="Singlets2") # add gate to GatingSet
+# recompute(gs) # recompute GatingSet
+# bfp_dots <-ggcyto(gs,aes(x=BFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 200)+geom_gate(g.bfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
+# 
+# #save plot
+# pdf(file=paste(dir,"BFP_dots_gate.pdf",sep=""),width = 10,height = 10)
+# bfp_dots
+# dev.off()
 
 
 
@@ -216,8 +216,9 @@ dev.off()
 
 
 p2=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
-data_stats=as.data.frame(ggplot_build(p2)$data[[1]][,1:5])
+data_stats=as.data.frame(ggplot_build(hp2)$data[[1]][,1:5])
 rownames(data_stats)=sort(unique(p1$data$sample))
+
 data_stats
 
 #write csv (open in excel) file with median stats
