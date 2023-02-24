@@ -137,21 +137,6 @@ pdf(file=paste(dir,"reporter_gate.pdf",sep=""),width = 10,height = 10)
 BFP_hist
 dev.off()
 
-# Probably focusing today mostly on trying to make a version 
-# of the analysis software that calculates the bfp/mcherry
-# fold change over different BFP bins (percentiles)
-
-
-
-# Where can I get the BFP positive data?
-
-# From the BFP data, bin it on quintiles
-
-# Calculate average mCherry for each bin
-
-# Divide the BF
-
-
 # coor1 <- c(685, 3.7e4)
 # coor2 <- c(535, 15e4)
 # coor3 <- c(635, 32e4)
