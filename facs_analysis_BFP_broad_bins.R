@@ -159,7 +159,7 @@ dev.off()
 # dev.off()
 
 
-#### BIN BFP ####
+###### BIN BFP ######
 
 # Create an empty data frame with the appropriate column names
 bfpbin_df <- data.frame(BFP_20 = numeric(), 
@@ -195,10 +195,10 @@ for (i in seq_along(pData(fs)$name)) {
   }
 }
 
-# Optional: Set row names of bfpbin_df to the sample names
+bfpbin_df
+
+# Set row names of bfpbin_df to the sample names
 rownames(bfpbin_df) <- pData(fs)$name
-
-
 
 
 #subset flowset to gated population
@@ -285,6 +285,9 @@ p2=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.tex
 data_stats=as.data.frame(ggplot_build(p2)$data[[1]][,1:5])
 rownames(data_stats)=sort(unique(p1$data$sample))
 data_stats <- cbind(data_stats, BFP_pos, Total_counts, Singlets, Live_percent, BFP_percent)
+
+bfpbin_df
+
 data_stats <- cbind(bfpbin_df, data_stats)
 
 data_stats
