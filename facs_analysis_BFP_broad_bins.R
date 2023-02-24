@@ -159,48 +159,6 @@ dev.off()
 # dev.off()
 
 
-###### BIN BFP ######
-
-# Create an empty data frame with the appropriate column names
-bfpbin_df <- data.frame(BFP_20 = numeric(), 
-                        BFP_40 = numeric(), 
-                        BFP_60 = numeric(), 
-                        BFP_80 = numeric(), 
-                        BFP_100 = numeric())
-
-# Loop over all_samples
-for (i in seq_along(pData(fs)$name)) {
-  # Extract the expression data for the i-th sample and create a data frame
-  df1 <- as.data.frame(exprs(fs_gated[[i]]))
-  
-  # Calculate the mCherry/BFP ratio for each cell in df1
-  df1$mCherry_BFP <- df1$mCherry / df1$BFP
-  
-  # Sort df1 by BFP from low to high
-  df1 <- df1[order(df1$BFP),]
-  
-  # Divide the sorted data into quintiles (20% intervals) based on BFP
-  n <- nrow(df1)
-  quintile_size <- n %/% 5
-  quintiles <- rep(1:5, each = quintile_size)
-  if (n %% 5 != 0) {
-    quintiles <- c(quintiles, rep(5, n %% 5))
-  }
-  df1$quintile <- quintiles
-  
-  # Compute the median mCherry/BFP ratio for each quintile and add it to bfpbin_df
-  for (q in 1:5) {
-    median_ratio <- median(df1$mCherry_BFP[df1$quintile == q])
-    bfpbin_df[i, q] <- median_ratio
-  }
-}
-
-bfpbin_df
-
-# Set row names of bfpbin_df to the sample names
-rownames(bfpbin_df) <- pData(fs)$name
-
-
 #subset flowset to gated population
 fs_gated=gs_pop_get_data(gs,'BFP_pos')
 
@@ -281,12 +239,53 @@ Singlets <- gating_rep[gating_rep$Population == '/Live/Singlets/Singlets2']$Coun
 Live_percent <- 100*gating_rep[gating_rep$Population == '/Live']$percent_of_parent
 BFP_percent <- 100*gating_rep[gating_rep$Population == '/Live/Singlets/Singlets2/BFP_pos']$percent_of_parent
 
+
+###### BIN BFP ######
+
+# Create an empty data frame with the appropriate column names
+bfpbin_df <- data.frame(BFP_20 = numeric(), 
+                        BFP_40 = numeric(), 
+                        BFP_60 = numeric(), 
+                        BFP_80 = numeric(), 
+                        BFP_100 = numeric())
+
+# Loop over all_samples
+for (i in seq_along(pData(fs)$name)) {
+  # Extract the expression data for the i-th sample and create a data frame
+  df1 <- as.data.frame(exprs(fs_gated[[i]]))
+  
+  # Calculate the mCherry/BFP ratio for each cell in df1
+  df1$mCherry_BFP <- df1$mCherry / df1$BFP
+  
+  # Sort df1 by BFP from low to high
+  df1 <- df1[order(df1$BFP),]
+  
+  # Divide the sorted data into quintiles (20% intervals) based on BFP
+  n <- nrow(df1)
+  quintile_size <- n %/% 5
+  quintiles <- rep(1:5, each = quintile_size)
+  if (n %% 5 != 0) {
+    quintiles <- c(quintiles, rep(5, n %% 5))
+  }
+  df1$quintile <- quintiles
+  
+  # Compute the median mCherry/BFP ratio for each quintile and add it to bfpbin_df
+  for (q in 1:5) {
+    median_ratio <- median(df1$mCherry_BFP[df1$quintile == q])
+    bfpbin_df[i, q] <- median_ratio
+  }
+}
+
+bfpbin_df
+
+
+# Set row names of bfpbin_df to the sample names
+rownames(bfpbin_df) <- pData(fs)$name
+
 p2=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 data_stats=as.data.frame(ggplot_build(p2)$data[[1]][,1:5])
 rownames(data_stats)=sort(unique(p1$data$sample))
 data_stats <- cbind(data_stats, BFP_pos, Total_counts, Singlets, Live_percent, BFP_percent)
-
-bfpbin_df
 
 data_stats <- cbind(bfpbin_df, data_stats)
 
