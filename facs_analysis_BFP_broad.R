@@ -122,7 +122,7 @@ dev.off()
 
 # 
 #set the reporter range for the gate
-#you should manually put the range in Shiva!
+#you should manually put the range in!
 # FOR THE USER RUNNING THE CODE you MUST put in the range that defines the bin for the data that will be analyzed! IMPORTANT!
 #The (250, 80k) is for 300 ng per well of 48-well.
 #gs_pop_remove(gs, node="BFP_pos")
@@ -136,6 +136,20 @@ BFP_hist
 pdf(file=paste(dir,"reporter_gate.pdf",sep=""),width = 10,height = 10)
 BFP_hist
 dev.off()
+
+# Probably focusing today mostly on trying to make a version 
+# of the analysis software that calculates the bfp/mcherry
+# fold change over different BFP bins (percentiles)
+
+
+
+# Where can I get the BFP positive data?
+
+# From the BFP data, bin it on quintiles
+
+# Calculate average mCherry for each bin
+
+# Divide the BF
 
 
 # coor1 <- c(685, 3.7e4)
@@ -160,12 +174,56 @@ dev.off()
 # dev.off()
 
 
+#### BIN BFP ####
+
+# Create an empty data frame with the appropriate column names
+bfpbin_df <- data.frame(BFP_20 = numeric(), 
+                        BFP_40 = numeric(), 
+                        BFP_60 = numeric(), 
+                        BFP_80 = numeric(), 
+                        BFP_100 = numeric())
+
+# Loop over all_samples
+for (i in seq_along(pData(fs)$name)) {
+  # Extract the expression data for the i-th sample and create a data frame
+  df1 <- as.data.frame(exprs(fs_gated[[i]]))
+  
+  # Calculate the mCherry/BFP ratio for each cell in df1
+  df1$mCherry_BFP <- df1$mCherry / df1$BFP
+  
+  # Sort df1 by BFP from low to high
+  df1 <- df1[order(df1$BFP),]
+  
+  # Divide the sorted data into quintiles (20% intervals) based on BFP
+  n <- nrow(df1)
+  quintile_size <- n %/% 5
+  quintiles <- rep(1:5, each = quintile_size)
+  if (n %% 5 != 0) {
+    quintiles <- c(quintiles, rep(5, n %% 5))
+  }
+  df1$quintile <- quintiles
+  
+  # Compute the median mCherry/BFP ratio for each quintile and add it to bfpbin_df
+  for (q in 1:5) {
+    median_ratio <- median(df1$mCherry_BFP[df1$quintile == q])
+    bfpbin_df[i, q] <- median_ratio
+  }
+}
+
+# Optional: Set row names of bfpbin_df to the sample names
+rownames(bfpbin_df) <- pData(fs)$name
+
+
+
 
 #subset flowset to gated population
 fs_gated=gs_pop_get_data(gs,'BFP_pos')
 
 #repeat model fit for gate selection confirmation
 df_pos=as.data.frame(exprs(fs_gated[[pos_c]]))
+
+write.csv(df_pos,file=paste(dir,"test_bfpbins.csv",sep=""))
+
 df_neg=as.data.frame(exprs(fs_gated[[neg_c]]))
 
 # coarsely fit a non-linear model for range evaluation
@@ -242,8 +300,10 @@ p2=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.tex
 data_stats=as.data.frame(ggplot_build(p2)$data[[1]][,1:5])
 rownames(data_stats)=sort(unique(p1$data$sample))
 data_stats <- cbind(data_stats, BFP_pos, Total_counts, Singlets, Live_percent, BFP_percent)
+data_stats <- cbind(bfpbin_df, data_stats)
 
 data_stats
 
 #write csv (open in excel) file with median stats
 write.csv(data_stats,file=paste(dir," median_stats.csv",sep=""))
+
