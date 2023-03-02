@@ -6,8 +6,10 @@ library('knitr')
 library('dplyr')
 library('broom')
 
+rm(list=ls())
+
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/benjaminchang/Desktop/Collins Lab/Flow Files/2023-02-21/Exp_20230221_1/Controls"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-28/Exp_20230228_3/GFP/controls/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -15,8 +17,8 @@ as.data.frame(pData(fs)$name)
 #select positive and negative samples from table above
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
-pos_c=1
-neg_c=2
+pos_c=2
+neg_c=5
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL9.A"] <- "GFP"
@@ -28,17 +30,17 @@ pData(fs)$name=names1[,1]
 
 gs <- GatingSet(fs)
 
-coor1 <- c(29e4, 0)
-coor2 <- c(26e4, 3e4)
-coor3 <- c(23e4, 10e4)
-coor4 <- c(30e4, 20e4)
-coor5 <- c(80e4, 47e4)
-coor6 <- c(90e4, 42e4)
-coor7 <- c(95e4, 20e4)
-coor8 <- c(45e4, 3e4)
+coor1 <- c(25e4, 0)
+coor2 <- c(22e4, 3e4)
+coor3 <- c(19e4, 10e4)
+coor4 <- c(26e4, 20e4)
+coor5 <- c(62.5e4, 50e4)
+coor6 <- c(86e4, 42e4)
+coor7 <- c(91e4, 20e4)
+coor8 <- c(41e4, 3e4)
 
 # define gate for live cells (ADJUST PARAMETERS ACCORDINGLY)
-#gs_pop_remove(gs, node='Live')
+gs_pop_remove(gs, node='Live')
 g.live <- polygonGate(filterId = "Live","FSC.A"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
 gs_pop_add(gs,g.live,parent="root") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
@@ -49,39 +51,39 @@ out_live
 # ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,5e6),y=c(-10,5e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 10,height = 10)
+pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 60,height = 10)
 out_live
 dev.off()
 
 
 ############# LIVE CHECKPOINT #############
 
-coor1 <- c(200e3, 140e1)
-coor2 <- c(170e3, 170e1)
-coor3 <- c(200e3, 220e1)
-coor4 <- c(260e3, 250e1)
-coor5 <- c(340e3, 2500)
-coor6 <- c(380e3, 2250)
-coor7 <- c(375e3, 1800)
-coor8 <- c(260e3, 1350)
+coor1 <- c(1.5e5, 140e1)
+coor2 <- c(1.2e5, 170e1)
+coor3 <- c(1.50e5, 220e1)
+coor4 <- c(2.10e5, 250e1)
+coor5 <- c(2.90e5, 2500)
+coor6 <- c(3.3e5, 2250)
+coor7 <- c(3.25e5, 1800)
+coor8 <- c(2.1e5, 1350)
 
 
 # define gate for singlets (ADJUST PARAMETERS ACCORDINGLY)
-#gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
+gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
 g.singlets <- polygonGate(filterId = "Singlets","FSC.H"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"FSC.Width"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
 gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 10,height = 10)
+pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 60,height = 10)
 singlet_out
 dev.off()
 
-coord1 <- c(19e4, 105e3)
-coord2 <- c(7e4, 170e3)
-coord3 <- c(59e4, 345e3)
-coord4 <- c(75e4, 310e3)
+coord1 <- c(190000, 1.05e5)
+coord2 <- c(70000, 1.70e5)
+coord3 <- c(465000, 2.95e5)
+coord4 <- c(687500, 2.60e5)
 
 # define gate for singlets2 (ADJUST PARAMETERS ACCORDINGLY)
 #gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
@@ -92,7 +94,7 @@ singlet2_out <- ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Singlets")+geom_hex(bins 
 singlet2_out
 
 #save plot
-pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 10,height = 10)
+pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 40,height = 40)
 singlet2_out
 dev.off()
 
@@ -121,42 +123,42 @@ gfp_reporter_range
 dev.off()
 
 # 
-#set the reporter range for the gate
-#you should manually put the range in!
-# FOR THE USER RUNNING THE CODE you MUST put in the range that defines the bin for the data that will be analyzed! IMPORTANT!
-#The (250, 80k) is for 300 ng per well of 48-well.
-#gs_pop_remove(gs, node="GFP_pos")
-g.gfp <- rectangleGate(filterId="GFP_pos",GFP=c(500,1e6))
-# check gate
-gs_pop_add(gs,g.gfp,parent="Singlets2") # add gate to GatingSet
-recompute(gs) # recalculate Gatingset
-GFP_hist <- ggcyto(gs,aes(x=GFP),subset="Singlets2",)+geom_density(fill="skyblue")+geom_gate("GFP_pos")+ geom_stats(adjust = 0.1,digits = 1)+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
-GFP_hist
-#save plot
-pdf(file=paste(dir,"reporter_gate.pdf",sep=""),width = 10,height = 10)
-GFP_hist
-dev.off()
-
-# coor1 <- c(685, 3.7e4)
-# coor2 <- c(535, 15e4)
-# coor3 <- c(635, 32e4)
-# coor4 <- c(1000, 42e4)
-# coor5 <- c(1e4, 52e4)
-# coor6 <- c(1.8e5, 51e4)
-# coor7 <- c(8e5, 35e4)
-# coor8 <- c(5e5, 2.5e4)
-# coor9 <- c(2.7e3, 1e4)
-# 
-# gs_pop_remove(gs, node="GFP_pos")  ######## VARIABLE ##########
-# g.gfp <- polygonGate(filterId = "GFP_pos","GFP"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1],coor9[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2],coor9[2]))
+# #set the reporter range for the gate
+# #you should manually put the range in!
+# # FOR THE USER RUNNING THE CODE you MUST put in the range that defines the bin for the data that will be analyzed! IMPORTANT!
+# #The (250, 80k) is for 300 ng per well of 48-well.
+# #gs_pop_remove(gs, node="GFP_pos")
+# g.gfp <- rectangleGate(filterId="GFP_pos",GFP=c(500,1e6))
+# # check gate
 # gs_pop_add(gs,g.gfp,parent="Singlets2") # add gate to GatingSet
-# recompute(gs) # recompute GatingSet
-# gfp_dots <-ggcyto(gs,aes(x=GFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 200)+geom_gate(g.gfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
-# 
+# recompute(gs) # recalculate Gatingset
+# GFP_hist <- ggcyto(gs,aes(x=GFP),subset="Singlets2",)+geom_density(fill="skyblue")+geom_gate("GFP_pos")+ geom_stats(adjust = 0.1,digits = 1)+scale_x_flowjo_biexp()+facet_wrap(~name,ncol = 8)
+# GFP_hist
 # #save plot
-# pdf(file=paste(dir,"GFP_dots_gate.pdf",sep=""),width = 10,height = 10)
-# gfp_dots
+# pdf(file=paste(dir,"reporter_gate.pdf",sep=""),width = 10,height = 10)
+# GFP_hist
 # dev.off()
+
+coor1 <- c(1185, 3.7e4)
+coor2 <- c(1035, 15e4)
+coor3 <- c(1135, 32e4)
+coor4 <- c(1500, 42e4)
+coor5 <- c(1e4, 52e4)
+coor6 <- c(1.8e5, 51e4)
+coor7 <- c(8e5, 35e4)
+coor8 <- c(5e5, 2.5e4)
+coor9 <- c(2.7e3, 1e4)
+
+gs_pop_remove(gs, node="GFP_pos")  ######## VARIABLE ##########
+g.gfp <- polygonGate(filterId = "GFP_pos","GFP"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1],coor9[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2],coor9[2]))
+gs_pop_add(gs,g.gfp,parent="Singlets2") # add gate to GatingSet
+recompute(gs) # recompute GatingSet
+gfp_dots <-ggcyto(gs,aes(x=GFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 100)+geom_gate(g.gfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
+
+#save plot
+pdf(file=paste(dir,"GFP_dots_gate.pdf",sep=""),width = 40,height = 10)
+gfp_dots
+dev.off()
 
 
 #subset flowset to gated population
@@ -292,4 +294,4 @@ data_stats <- cbind(gfpbin_df, data_stats)
 data_stats
 
 #write csv (open in excel) file with median stats
-write.csv(data_stats,file=paste(dir," median_stats.csv",sep=""))
+write.csv(data_stats,file=paste(dir,"GFP_median_stats.csv",sep=""))
