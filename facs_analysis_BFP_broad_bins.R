@@ -9,7 +9,7 @@ library('broom')
 rm(list=ls())
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-28/Exp_20230228_3/subset/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-04-05/Exp_20230405_2/controls/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -18,7 +18,7 @@ as.data.frame(pData(fs)$name)
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
 pos_c=3
-neg_c=11
+neg_c=4
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -51,21 +51,31 @@ out_live
 # ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,5e6),y=c(-10,5e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 60,height = 60)
+pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 40,height = 40)
 out_live
 dev.off()
 
 
 ############# LIVE CHECKPOINT #############
+# NaOH
+coor1 <- c(1.5e5, 1275)
+coor2 <- c(1.2e5, 1575)
+coor3 <- c(1.50e5, 2075)
+coor4 <- c(2.10e5, 2375)
+coor5 <- c(3.15e5, 2375)
+coor6 <- c(3.55e5, 2125)
+coor7 <- c(3.5e5, 1675)
+coor8 <- c(2.1e5, 1225)
 
-coor1 <- c(1.5e5, 140e1)
-coor2 <- c(1.2e5, 170e1)
-coor3 <- c(1.50e5, 220e1)
-coor4 <- c(2.10e5, 250e1)
-coor5 <- c(2.90e5, 2500)
-coor6 <- c(3.3e5, 2250)
-coor7 <- c(3.25e5, 1800)
-coor8 <- c(2.1e5, 1350)
+# # DMSO
+# coor1 <- c(1.5e5, 1250)
+# coor2 <- c(1.2e5, 1450)
+# coor3 <- c(1.50e5, 1950)
+# coor4 <- c(2.10e5, 2250)
+# coor5 <- c(2.90e5, 2250)
+# coor6 <- c(3.3e5, 2000)
+# coor7 <- c(3.25e5, 1550)
+# coor8 <- c(2.1e5, 1100)
 
 
 # define gate for singlets (ADJUST PARAMETERS ACCORDINGLY)
@@ -76,17 +86,17 @@ recompute(gs) # recompute GatingSet
 singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 60,height = 60)
+pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 40,height = 40)
 singlet_out
 dev.off()
 
 coord1 <- c(190000, 1.05e5)
 coord2 <- c(70000, 1.70e5)
-coord3 <- c(465000, 2.95e5)
-coord4 <- c(687500, 2.60e5)
+coord3 <- c(400000, 3e5)
+coord4 <- c(687500, 2.85e5)
 
 # define gate for singlets2 (ADJUST PARAMETERS ACCORDINGLY)
-gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
+# gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
 g.singlets2 <- polygonGate(filterId = "Singlets2","FSC.A"=c(coord1[1],coord2[1],coord3[1],coord4[1]),"FSC.H"=c(coord1[2],coord2[2],coord3[2],coord4[2]))
 gs_pop_add(gs,g.singlets2,parent="Singlets") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
@@ -94,7 +104,7 @@ singlet2_out <- ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Singlets")+geom_hex(bins 
 singlet2_out
 
 #save plot
-pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 60,height = 60)
+pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 40,height = 40)
 singlet2_out
 dev.off()
 
@@ -149,14 +159,14 @@ coor7 <- c(8e5, 35e4)
 coor8 <- c(5e5, 2.5e4)
 coor9 <- c(2.7e3, 1e4)
 
-gs_pop_remove(gs, node="BFP_pos")  ######## VARIABLE ##########
+# gs_pop_remove(gs, node="BFP_pos")  ######## VARIABLE ##########
 g.bfp <- polygonGate(filterId = "BFP_pos","BFP"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1],coor9[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2],coor9[2]))
 gs_pop_add(gs,g.bfp,parent="Singlets2") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 bfp_dots <-ggcyto(gs,aes(x=BFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 100)+geom_gate(g.bfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"BFP_dots_gate.pdf",sep=""),width = 60,height = 10)
+pdf(file=paste(dir,"BFP_dots_gate.pdf",sep=""),width = 40,height = 40)
 bfp_dots
 dev.off()
 
@@ -225,6 +235,8 @@ for (i in 1:length(rownames(pData(fs_gated)))){
     df$sample=rownames(pData(fs_gated[i]))
     results=rbind(results,df)
   }}
+
+
 results$sample=(results %>% tidyr::separate(sample,c('plate','bla','well',extra='drop')) %>% select('well'))[,1]
 
 p1=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))

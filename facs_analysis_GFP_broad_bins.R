@@ -9,7 +9,7 @@ library('broom')
 rm(list=ls())
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-28/Exp_20230228_3/GFP/controls/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-02-28/Exp_20230228_3/GFP/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -51,7 +51,7 @@ out_live
 # ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,5e6),y=c(-10,5e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 60,height = 10)
+pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 40,height = 40)
 out_live
 dev.off()
 
@@ -76,7 +76,7 @@ recompute(gs) # recompute GatingSet
 singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 60,height = 10)
+pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 40,height = 40)
 singlet_out
 dev.off()
 
@@ -156,7 +156,7 @@ recompute(gs) # recompute GatingSet
 gfp_dots <-ggcyto(gs,aes(x=GFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 100)+geom_gate(g.gfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"GFP_dots_gate.pdf",sep=""),width = 40,height = 10)
+pdf(file=paste(dir,"GFP_dots_gate.pdf",sep=""),width = 40,height = 40)
 gfp_dots
 dev.off()
 
