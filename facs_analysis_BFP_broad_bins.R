@@ -9,7 +9,7 @@ library('broom')
 rm(list=ls())
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-04-05/Exp_20230405_2/controls/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-11-09-triple_combinatorial/Exp_20231109_3/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -17,8 +17,8 @@ as.data.frame(pData(fs)$name)
 #select positive and negative samples from table above
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
-pos_c=3
-neg_c=4
+pos_c=14
+neg_c=18
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -33,14 +33,14 @@ gs <- GatingSet(fs)
 coor1 <- c(25e4, 0)
 coor2 <- c(22e4, 3e4)
 coor3 <- c(19e4, 10e4)
-coor4 <- c(26e4, 20e4)
-coor5 <- c(62.5e4, 50e4)
+coor4 <- c(26e4, 23e4)
+coor5 <- c(62.5e4, 53e4)
 coor6 <- c(86e4, 42e4)
 coor7 <- c(91e4, 20e4)
 coor8 <- c(41e4, 3e4)
 
 # define gate for live cells (ADJUST PARAMETERS ACCORDINGLY)
-#gs_pop_remove(gs, node='Live')
+# gs_pop_remove(gs, node='Live')
 g.live <- polygonGate(filterId = "Live","FSC.A"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
 gs_pop_add(gs,g.live,parent="root") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
@@ -58,24 +58,24 @@ dev.off()
 
 ############# LIVE CHECKPOINT #############
 # NaOH
-coor1 <- c(1.5e5, 1275)
+coor1 <- c(1.5e5, 1425)
 coor2 <- c(1.2e5, 1575)
-coor3 <- c(1.50e5, 2075)
-coor4 <- c(2.10e5, 2375)
-coor5 <- c(3.15e5, 2375)
+coor3 <- c(1.55e5, 2075)
+coor4 <- c(2.1e5, 2575)
+coor5 <- c(3.15e5, 2575)
 coor6 <- c(3.55e5, 2125)
 coor7 <- c(3.5e5, 1675)
-coor8 <- c(2.1e5, 1225)
+coor8 <- c(2.1e5, 1425)
 
 # # DMSO
-# coor1 <- c(1.5e5, 1250)
-# coor2 <- c(1.2e5, 1450)
-# coor3 <- c(1.50e5, 1950)
-# coor4 <- c(2.10e5, 2250)
-# coor5 <- c(2.90e5, 2250)
-# coor6 <- c(3.3e5, 2000)
-# coor7 <- c(3.25e5, 1550)
-# coor8 <- c(2.1e5, 1100)
+# coor1 <- c(1.25e5, 1475)
+# coor2 <- c(0.95e5, 1700)
+# coor3 <- c(1.25e5, 2200)
+# coor4 <- c(1.85e5, 2500)
+# coor5 <- c(2.90e5, 2500)
+# coor6 <- c(3.3e5, 2250)
+# coor7 <- c(3.25e5, 1800)
+# coor8 <- c(2.1e5, 1475)
 
 
 # define gate for singlets (ADJUST PARAMETERS ACCORDINGLY)
@@ -90,10 +90,17 @@ pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 40,height = 40)
 singlet_out
 dev.off()
 
-coord1 <- c(190000, 1.05e5)
-coord2 <- c(70000, 1.70e5)
-coord3 <- c(400000, 3e5)
-coord4 <- c(687500, 2.85e5)
+# coord1 <- c(190000, 1.05e5)
+# coord2 <- c(70000, 1.70e5)
+# coord3 <- c(400000, 3e5)
+# coord4 <- c(687500, 2.85e5)
+
+# shifted right and down
+coord1 <- c(190000, 0.75e5)
+coord2 <- c(70000, 1.50e5)
+coord3 <- c(460000, 3e5)
+coord4 <- c(747500, 2.85e5)
+
 
 # define gate for singlets2 (ADJUST PARAMETERS ACCORDINGLY)
 # gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
@@ -149,21 +156,36 @@ dev.off()
 # BFP_hist
 # dev.off()
 
-coor1 <- c(685, 3.7e4)
-coor2 <- c(535, 15e4)
-coor3 <- c(635, 32e4)
-coor4 <- c(1000, 42e4)
+
+# STANDARD
+coor1 <- c(885, 3.7e4)
+coor2 <- c(735, 15e4)
+coor3 <- c(835, 32e4)
+coor4 <- c(1200, 42e4)
 coor5 <- c(1e4, 52e4)
 coor6 <- c(1.8e5, 51e4)
 coor7 <- c(8e5, 35e4)
 coor8 <- c(5e5, 2.5e4)
 coor9 <- c(2.7e3, 1e4)
 
+
+# # JCC_27/51 high expression
+# coor1 <- c(2685, 3.7e4)
+# coor2 <- c(2535, 15e4)
+# coor3 <- c(2635, 32e4)
+# coor4 <- c(3000, 42e4)
+# coor5 <- c(1.5e4, 52e4)
+# coor6 <- c(3.85e5, 51e4)
+# coor7 <- c(10.05e5, 35e4)
+# coor8 <- c(7.05e5, 2.5e4)
+# coor9 <- c(7.7e3, 1e4)
+
+
 # gs_pop_remove(gs, node="BFP_pos")  ######## VARIABLE ##########
 g.bfp <- polygonGate(filterId = "BFP_pos","BFP"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1],coor9[1]),"SSC.A"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2],coor9[2]))
 gs_pop_add(gs,g.bfp,parent="Singlets2") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
-bfp_dots <-ggcyto(gs,aes(x=BFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 100)+geom_gate(g.bfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
+bfp_dots <-ggcyto(gs,aes(x=BFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 30)+geom_gate(g.bfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
 
 #save plot
 pdf(file=paste(dir,"BFP_dots_gate.pdf",sep=""),width = 40,height = 40)
@@ -239,10 +261,13 @@ for (i in 1:length(rownames(pData(fs_gated)))){
 
 results$sample=(results %>% tidyr::separate(sample,c('plate','bla','well',extra='drop')) %>% select('well'))[,1]
 
-p1=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+p1 <- ggplot(results, aes(x = sample, y = mCherry / BFP)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
+  scale_y_log10()
 p1
 #save the plot
-pdf(file=paste(dir,"single_sample_induction_boxplot.pdf",sep=""),width = 10,height = 10)
+pdf(file=paste(dir,"single_sample_induction_boxplot.pdf",sep=""),width = 40,height = 10)
 p1
 dev.off()
 
