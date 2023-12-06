@@ -9,7 +9,7 @@ library('broom')
 rm(list=ls())
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-11-09-triple_combinatorial/Exp_20231109_3/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-12-03_two_drug_tandems/Exp_20231203_1/subset/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -17,8 +17,8 @@ as.data.frame(pData(fs)$name)
 #select positive and negative samples from table above
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
-pos_c=14
-neg_c=18
+pos_c=10
+neg_c=7
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -167,6 +167,18 @@ coor6 <- c(1.8e5, 51e4)
 coor7 <- c(8e5, 35e4)
 coor8 <- c(5e5, 2.5e4)
 coor9 <- c(2.7e3, 1e4)
+
+
+# Tetracycline autofluorescence
+# coor1 <- c(5885, 3.7e4)
+# coor2 <- c(5735, 15e4)
+# coor3 <- c(5835, 32e4)
+# coor4 <- c(6200, 42e4)
+# coor5 <- c(1e4, 52e4)
+# coor6 <- c(1.8e5, 51e4)
+# coor7 <- c(8e5, 35e4)
+# coor8 <- c(5e5, 2.5e4)
+# coor9 <- c(7.7e3, 1e4)
 
 
 # # JCC_27/51 high expression
