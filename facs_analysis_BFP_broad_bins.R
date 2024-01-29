@@ -9,7 +9,7 @@ library('broom')
 rm(list=ls())
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2023-12-03_two_drug_tandems/Exp_20231203_1/subset/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2024-01-27_tandem_HeLa/Exp_20240127_2/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -17,8 +17,8 @@ as.data.frame(pData(fs)$name)
 #select positive and negative samples from table above
 #replace values below"
 #FOR THE USER RUNNING THE CODE put in the values depending on the generated table:
-pos_c=10
-neg_c=7
+pos_c=1
+neg_c=4
 
 ##change column names for ease of use
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
@@ -30,14 +30,29 @@ pData(fs)$name=names1[,1]
 
 gs <- GatingSet(fs)
 
+
+# # HEK
+# coor1 <- c(25e4, 0)
+# coor2 <- c(22e4, 3e4)
+# coor3 <- c(19e4, 10e4)
+# coor4 <- c(26e4, 23e4)
+# coor5 <- c(62.5e4, 53e4)
+# coor6 <- c(86e4, 42e4)
+# coor7 <- c(91e4, 20e4)
+# coor8 <- c(41e4, 3e4)
+
+
+# HELA
 coor1 <- c(25e4, 0)
 coor2 <- c(22e4, 3e4)
-coor3 <- c(19e4, 10e4)
-coor4 <- c(26e4, 23e4)
-coor5 <- c(62.5e4, 53e4)
-coor6 <- c(86e4, 42e4)
+coor3 <- c(22e4, 7e4)
+coor4 <- c(37.5e4, 20e4)
+coor5 <- c(62.5e4, 50e4)
+coor6 <- c(91e4, 62e4)
 coor7 <- c(91e4, 20e4)
 coor8 <- c(41e4, 3e4)
+
+
 
 # define gate for live cells (ADJUST PARAMETERS ACCORDINGLY)
 # gs_pop_remove(gs, node='Live')
@@ -57,15 +72,26 @@ dev.off()
 
 
 ############# LIVE CHECKPOINT #############
-# NaOH
-coor1 <- c(1.5e5, 1425)
-coor2 <- c(1.2e5, 1575)
-coor3 <- c(1.55e5, 2075)
-coor4 <- c(2.1e5, 2575)
-coor5 <- c(3.15e5, 2575)
-coor6 <- c(3.55e5, 2125)
-coor7 <- c(3.5e5, 1675)
-coor8 <- c(2.1e5, 1425)
+# # NaOH
+# coor1 <- c(1.5e5, 1425)
+# coor2 <- c(1.2e5, 1575)
+# coor3 <- c(1.55e5, 2075)
+# coor4 <- c(2.1e5, 2575)
+# coor5 <- c(3.15e5, 2575)
+# coor6 <- c(3.55e5, 2125)
+# coor7 <- c(3.5e5, 1675)
+# coor8 <- c(2.1e5, 1425)
+
+# HELA
+coor1 <- c(2.0e5, 1175)
+coor2 <- c(1.7e5, 1325)
+coor3 <- c(1.7e5, 2300)
+coor4 <- c(2.6e5, 2525)
+coor5 <- c(3.65e5, 2525)
+coor6 <- c(4.05e5, 2300)
+coor7 <- c(4.0e5, 1425)
+coor8 <- c(2.6e5, 1175)
+
 
 # # DMSO
 # coor1 <- c(1.25e5, 1475)
@@ -84,22 +110,24 @@ g.singlets <- polygonGate(filterId = "Singlets","FSC.H"=c(coor1[1],coor2[1],coor
 gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+# singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
 pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 40,height = 40)
 singlet_out
 dev.off()
 
-# coord1 <- c(190000, 1.05e5)
-# coord2 <- c(70000, 1.70e5)
-# coord3 <- c(400000, 3e5)
-# coord4 <- c(687500, 2.85e5)
+# # shifted right and down
+# coord1 <- c(190000, 0.75e5)
+# coord2 <- c(70000, 1.50e5)
+# coord3 <- c(460000, 3e5)
+# coord4 <- c(747500, 2.85e5)
 
-# shifted right and down
-coord1 <- c(190000, 0.75e5)
-coord2 <- c(70000, 1.50e5)
-coord3 <- c(460000, 3e5)
-coord4 <- c(747500, 2.85e5)
+# HELA
+coord1 <- c(300000, 1.05e5)
+coord2 <- c(70000, 1.70e5)
+coord3 <- c(375000, 3.7e5)
+coord4 <- c(1000000, 3.7e5)
 
 
 # define gate for singlets2 (ADJUST PARAMETERS ACCORDINGLY)
@@ -107,7 +135,7 @@ coord4 <- c(747500, 2.85e5)
 g.singlets2 <- polygonGate(filterId = "Singlets2","FSC.A"=c(coord1[1],coord2[1],coord3[1],coord4[1]),"FSC.H"=c(coord1[2],coord2[2],coord3[2],coord4[2]))
 gs_pop_add(gs,g.singlets2,parent="Singlets") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
-singlet2_out <- ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Singlets")+geom_hex(bins = 128)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(1,2e6),y=c(1e4,4e5))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+singlet2_out <- ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Singlets")+geom_hex(bins = 32)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(1,2e6),y=c(1e4,4e5))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 singlet2_out
 
 #save plot
@@ -169,7 +197,7 @@ coor8 <- c(5e5, 2.5e4)
 coor9 <- c(2.7e3, 1e4)
 
 
-# Tetracycline autofluorescence
+# # Tetracycline autofluorescence
 # coor1 <- c(5885, 3.7e4)
 # coor2 <- c(5735, 15e4)
 # coor3 <- c(5835, 32e4)
@@ -179,6 +207,18 @@ coor9 <- c(2.7e3, 1e4)
 # coor7 <- c(8e5, 35e4)
 # coor8 <- c(5e5, 2.5e4)
 # coor9 <- c(7.7e3, 1e4)
+
+
+# # # Tetracycline autofluorescence 2
+# coor1 <- c(10885, 3.7e4)
+# coor2 <- c(10735, 15e4)
+# coor3 <- c(10835, 32e4)
+# coor4 <- c(11200, 42e4)
+# coor5 <- c(1.5e4, 52e4)
+# coor6 <- c(1.8e5, 51e4)
+# coor7 <- c(8e5, 35e4)
+# coor8 <- c(5e5, 2.5e4)
+# coor9 <- c(12700, 1e4)
 
 
 # # JCC_27/51 high expression
