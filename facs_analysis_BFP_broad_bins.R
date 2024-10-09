@@ -9,7 +9,7 @@ library('broom')
 rm(list=ls())
 
 # FOR THE USER RUNNING THE CODE:set directory to get fcs files as set (CHANGE DIRECTORY ACCORDINGLY!)
-dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2024-01-27_tandem_HeLa/Exp_20240127_2/"
+dir="/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2024-10-08_NGN/Plate_2/Exp_20241008_3/"
 
 fs <- read.flowSet(path = dir,pattern = ".fcs",alter.names = T) #,truncate_max_range = FALSE)
 as.data.frame(pData(fs)$name)
@@ -20,9 +20,61 @@ as.data.frame(pData(fs)$name)
 pos_c=1
 neg_c=4
 
-##change column names for ease of use
+##change column names for ease of use. Can use helper fx below to check
+# FL18.A is iRFP
+# FL4.A is BFP
+# Fl9.A is GFP
+# FL13.A is mCherry. 
+# FL17.A is R660-APC (AF647)
+
+# Confirm that the channels are set up correctly.
+# Read the FCS file
+ff <- read.FCS(paste0(dir, '01-Well-D1.fcs'), transformation = FALSE, truncate_max_range = FALSE)
+
+# Define the PnS values we're looking for
+target_pns <- c("V450-PB-A", "Y610-mCHERRY-A")
+
+# Function to find PnN for a given PnS
+find_pnn <- function(target_pns) {
+  for (i in 1:length(ff@description)) {
+    pns <- ff@description[[paste0("$P", i, "S")]]
+    if (pns == target_pns) {
+      return(ff@description[[paste0("$P", i, "N")]])
+    }
+  }
+  return(NULL)  # Return NULL if not found
+}
+
+# Find and print PnN for each target PnS
+for (pns in target_pns) {
+  pnn <- find_pnn(pns)
+  if (!is.null(pnn)) {
+    cat("For $PnS:", pns, "\n")
+    cat("  $PnN:", pnn, "\n\n")
+  } else {
+    cat("No matching channel found for $PnS:", pns, "\n\n")
+  }
+}
+
+
+# colnames(fs)[colnames(fs)=="FL18.A"] <- "BFP"
+# colnames(fs)[colnames(fs)=="FL12.A"] <- "BFP"
+# colnames(fs)[colnames(fs)=="FL5.A"] <- "mCherry"
 colnames(fs)[colnames(fs)=="FL4.A"] <- "BFP"
 colnames(fs)[colnames(fs)=="FL13.A"] <- "mCherry"
+
+
+
+# # # Check channel names to figure out names
+# ff <- read.FCS('/Users/joncchen/Dropbox (MIT)/Collins Lab: RNA-ligand screen/Raw Flow Files/2024-09-28-nLuc-tet-2nd-batch/Exp_20240928_1/tet/01-Well-B1.fcs', transformation = FALSE, truncate_max_range = FALSE)
+# for (i in 1:17) {
+#   pns <- ff@description[[paste0("$P", i, "S")]]
+#   pnn <- ff@description[[paste0("$P", i, "N")]]
+#   cat("Channel", i, "\n")
+#   cat("  $PnS:", pns, "\n")
+#   cat("  $PnN:", pnn, "\n\n")
+# }
+
 
 #edit sample to name, keep well only
 names1=(pData(fs) %>% tidyr::separate(name,c('plate','bla','well',extra='drop'))) %>% select('well')
@@ -40,17 +92,61 @@ gs <- GatingSet(fs)
 # coor6 <- c(86e4, 42e4)
 # coor7 <- c(91e4, 20e4)
 # coor8 <- c(41e4, 3e4)
+# 
+# # 240427 new HEK
+# coor1 <- c(25e4, 0)
+# coor2 <- c(15e4, 5e4)
+# coor3 <- c(19e4, 20e4)
+# coor4 <- c(26e4, 28e4)
+# coor5 <- c(62.5e4, 53e4)
+# coor6 <- c(86e4, 42e4)
+# coor7 <- c(91e4, 20e4)
+# coor8 <- c(41e4, 3e4)
 
 
-# HELA
+# # mcgonagall
 coor1 <- c(25e4, 0)
-coor2 <- c(22e4, 3e4)
-coor3 <- c(22e4, 7e4)
-coor4 <- c(37.5e4, 20e4)
-coor5 <- c(62.5e4, 50e4)
-coor6 <- c(91e4, 62e4)
+coor2 <- c(15e4, 5e4)
+coor3 <- c(19e4, 20e4)
+coor4 <- c(26e4, 37.5e4)
+coor5 <- c(62.5e4, 75e4)
+coor6 <- c(86e4, 42e4)
 coor7 <- c(91e4, 20e4)
 coor8 <- c(41e4, 3e4)
+
+# salem
+coor1 <- c(46e4, 0)
+coor2 <- c(36e4, 5e4)
+coor3 <- c(40e4, 20e4)
+coor4 <- c(47e4, 37.5e4)
+coor5 <- c(83.5e4, 75e4)
+coor6 <- c(107e4, 42e4)
+coor7 <- c(112e4, 10e4)
+coor8 <- c(62e4, 3e4)
+
+
+
+# # # HepG2
+# coor1 <- c(25e4, 0)
+# coor2 <- c(15e4, 5e4)
+# coor3 <- c(19e4, 20e4)
+# coor4 <- c(26e4, 28e4)
+# coor5 <- c(62.5e4, 53e4)
+# coor6 <- c(86e4, 42e4)
+# coor7 <- c(91e4, 20e4)
+# coor8 <- c(41e4, 3e4)
+
+
+
+# # # HELA
+# coor1 <- c(25e4, 0)
+# coor2 <- c(22e4, 3e4)
+# coor3 <- c(22e4, 7e4)
+# coor4 <- c(37.5e4, 20e4)
+# coor5 <- c(62.5e4, 50e4)
+# coor6 <- c(91e4, 62e4)
+# coor7 <- c(91e4, 20e4)
+# coor8 <- c(41e4, 3e4)
 
 
 
@@ -62,17 +158,62 @@ recompute(gs) # recompute GatingSet
 
 #check gate - lower bins = less processing power required
 out_live <- ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 2048)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(-10,1e6),y=c(-10,1e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+# out_live <- ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 256)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(-10,1e6),y=c(-10,1e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 out_live
 # ggcyto(gs,aes(x=FSC.A,y=SSC.A),subset="root")+geom_hex(bins = 200)+geom_gate(g.live)+ggcyto_par_set(limits = list(x=c(1,5e6),y=c(-10,5e6))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
 
 #save plot
-pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 40,height = 40)
+pdf(file=paste(dir,"live_gate.pdf",sep=""),width = 80,height = 50)
 out_live
 dev.off()
 
 
 ############# LIVE CHECKPOINT #############
-# # NaOH
+
+
+
+# mcgonagall
+coord1 <- c(190000, 0.75e5)
+coord2 <- c(70000, 1.50e5)
+coord3 <- c(460000, 3e5)
+coord4 <- c(747500, 2.85e5)
+
+# salem
+coord1 <- c(440000, 2.75e5)
+coord2 <- c(320000, 5.50e5)
+coord3 <- c(710000, 7e5)
+coord4 <- c(997500, 4.85e5)
+
+
+# # kehan's FACS right 1.05, down 0.3
+# coord1 <- c(295000, 0.45e5)
+# coord2 <- c(175000, 1.20e5)
+# coord3 <- c(565000, 2.5e5)
+# coord4 <- c(852500, 2.55e5)
+
+# # HELA
+# coord1 <- c(300000, 1.05e5)
+# coord2 <- c(70000, 1.70e5)
+# coord3 <- c(375000, 3.7e5)
+# coord4 <- c(1000000, 3.7e5)
+
+
+# define gate for singlets2 (ADJUST PARAMETERS ACCORDINGLY)
+# gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
+g.singlets <- polygonGate(filterId = "Singlets","FSC.A"=c(coord1[1],coord2[1],coord3[1],coord4[1]),"FSC.H"=c(coord1[2],coord2[2],coord3[2],coord4[2]))
+gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
+recompute(gs) # recompute GatingSet
+singlet_out <- ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(1,1.5e6),y=c(1e4,10e5))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+singlet_out
+
+#save plot
+pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 80,height = 50)
+singlet_out
+dev.off()
+
+
+
+# NaOH
 # coor1 <- c(1.5e5, 1425)
 # coor2 <- c(1.2e5, 1575)
 # coor3 <- c(1.55e5, 2075)
@@ -82,66 +223,81 @@ dev.off()
 # coor7 <- c(3.5e5, 1675)
 # coor8 <- c(2.1e5, 1425)
 
-# HELA
-coor1 <- c(2.0e5, 1175)
-coor2 <- c(1.7e5, 1325)
-coor3 <- c(1.7e5, 2300)
-coor4 <- c(2.6e5, 2525)
-coor5 <- c(3.65e5, 2525)
-coor6 <- c(4.05e5, 2300)
-coor7 <- c(4.0e5, 1425)
-coor8 <- c(2.6e5, 1175)
+# # HELA
+# coor1 <- c(2.0e5, 1175)
+# coor2 <- c(1.7e5, 1325)
+# coor3 <- c(1.7e5, 2300)
+# coor4 <- c(2.6e5, 2525)
+# coor5 <- c(3.65e5, 2525)
+# coor6 <- c(4.05e5, 2300)
+# coor7 <- c(4.0e5, 1425)
+# coor8 <- c(2.6e5, 1175)
+
+# # kehan left 0.65, down 1500
+# coor1 <- c(0.6e5, -25)
+# coor2 <- c(0.3e5, 200)
+# coor3 <- c(0.6e5, 700)
+# coor4 <- c(1.2e5, 1000)
+# coor5 <- c(2.25e5, 1000)
+# coor6 <- c(2.65e5, 750)
+# coor7 <- c(2.6e5, 300)
+# coor8 <- c(1.45e5, -25)
+
+# # NaOH 240427
+coor1 <- c(1.25e5, 1475)
+coor2 <- c(0.95e5, 1700)
+coor3 <- c(1.25e5, 2200)
+coor4 <- c(1.85e5, 2500)
+coor5 <- c(2.90e5, 2500)
+coor6 <- c(3.3e5, 2250)
+coor7 <- c(3.25e5, 1800)
+coor8 <- c(2.1e5, 1475)
 
 
-# # DMSO
-# coor1 <- c(1.25e5, 1475)
-# coor2 <- c(0.95e5, 1700)
-# coor3 <- c(1.25e5, 2200)
-# coor4 <- c(1.85e5, 2500)
-# coor5 <- c(2.90e5, 2500)
-# coor6 <- c(3.3e5, 2250)
-# coor7 <- c(3.25e5, 1800)
-# coor8 <- c(2.1e5, 1475)
+# NaOH left 0.25, down 250 - mcgonagall good
+coor1 <- c(1.0e5, 1225)
+coor2 <- c(0.7e5, 1450)
+coor3 <- c(1.0e5, 1950)
+coor4 <- c(1.6e5, 2250)
+coor5 <- c(2.65e5, 2250)
+coor6 <- c(3.95e5, 2000)
+coor7 <- c(3.0e5, 1550)
+coor8 <- c(1.85e5, 1225)
+
+# salem
+coor1 <- c(3.0e5, 975)
+coor2 <- c(2.7e5, 1200)
+coor3 <- c(3.0e5, 1700)
+coor4 <- c(3.6e5, 2000)
+coor5 <- c(4.65e5, 2000)
+coor6 <- c(5.95e5, 1750)
+coor7 <- c(5.0e5, 1050)
+coor8 <- c(3.85e5, 975)
+
 
 
 # define gate for singlets (ADJUST PARAMETERS ACCORDINGLY)
-# gs_pop_remove(gs, node="Singlets")  ######## VARIABLE ##########
-g.singlets <- polygonGate(filterId = "Singlets","FSC.H"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"FSC.Width"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
-gs_pop_add(gs,g.singlets,parent="Live") # add gate to GatingSet
-recompute(gs) # recompute GatingSet
-singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
-# singlet_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Live")+geom_hex(bins = 256)+geom_gate(g.singlets)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
-
-#save plot
-pdf(file=paste(dir,"singlets_gate.pdf",sep=""),width = 40,height = 40)
-singlet_out
-dev.off()
-
-# # shifted right and down
-# coord1 <- c(190000, 0.75e5)
-# coord2 <- c(70000, 1.50e5)
-# coord3 <- c(460000, 3e5)
-# coord4 <- c(747500, 2.85e5)
-
-# HELA
-coord1 <- c(300000, 1.05e5)
-coord2 <- c(70000, 1.70e5)
-coord3 <- c(375000, 3.7e5)
-coord4 <- c(1000000, 3.7e5)
-
-
-# define gate for singlets2 (ADJUST PARAMETERS ACCORDINGLY)
 # gs_pop_remove(gs, node="Singlets2")  ######## VARIABLE ##########
-g.singlets2 <- polygonGate(filterId = "Singlets2","FSC.A"=c(coord1[1],coord2[1],coord3[1],coord4[1]),"FSC.H"=c(coord1[2],coord2[2],coord3[2],coord4[2]))
+g.singlets2 <- polygonGate(filterId = "Singlets2","FSC.H"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"FSC.Width"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
+# g.singlets2 <- polygonGate(filterId = "Singlets2","FSC.H"=c(coor1[1],coor2[1],coor3[1],coor4[1],coor5[1],coor6[1],coor7[1],coor8[1]),"FSC.W"=c(coor1[2],coor2[2],coor3[2],coor4[2],coor5[2],coor6[2],coor7[2],coor8[2]))
 gs_pop_add(gs,g.singlets2,parent="Singlets") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
-singlet2_out <- ggcyto(gs,aes(x=FSC.A,y=FSC.H),subset="Singlets")+geom_hex(bins = 32)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(1,2e6),y=c(1e4,4e5))) + facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+singlet2_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.Width),subset="Singlets")+geom_hex(bins = 128)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(0,800e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+# singlet2_out <- ggcyto(gs,aes(x=FSC.H,y=FSC.W),subset="Singlets")+geom_hex(bins = 128)+geom_gate(g.singlets2)+ggcyto_par_set(limits = list(x=c(0,400e3),y=c(0,400e1)))+ facet_wrap(~name,ncol = 8) + geom_stats(adjust = 0.8)
+
 singlet2_out
 
 #save plot
-pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 40,height = 40)
+pdf(file=paste(dir,"singlets2_gate.pdf",sep=""),width = 80,height = 50)
 singlet2_out
 dev.off()
+
+
+
+
+
+
+
 
 ############# SINGLETS CHECKPOINT #############
 
@@ -162,6 +318,8 @@ df_neg <- augment(model, df_neg)
 #change values of xlim to evaluated the best reporter expression range
 # FOR THE USER RUNNING THE CODE, the numbers in front of xlim could be set depending on the x-axis range you want to see
 bfp_reporter_range <- ggplot(df_neg,aes(BFP,.fitted)) + geom_line(color='red') + geom_line(data=df_pos,aes(x=BFP,.fitted),color='blue') + xlim(250,80000)
+bfp_reporter_range
+
 #save plot
 pdf(file=paste(dir,"model_test_to_set_reporter_range.pdf",sep=""),width = 10,height = 10)
 bfp_reporter_range
@@ -197,40 +355,145 @@ coor8 <- c(5e5, 2.5e4)
 coor9 <- c(2.7e3, 1e4)
 
 
-# # Tetracycline autofluorescence
-# coor1 <- c(5885, 3.7e4)
-# coor2 <- c(5735, 15e4)
-# coor3 <- c(5835, 32e4)
-# coor4 <- c(6200, 42e4)
-# coor5 <- c(1e4, 52e4)
-# coor6 <- c(1.8e5, 51e4)
-# coor7 <- c(8e5, 35e4)
+# # Tight BFP expression
+coor1 <- c(785, 3.7e4)
+coor2 <- c(635, 15e4)
+coor3 <- c(735, 57e4)
+coor4 <- c(1200, 67e4)
+coor5 <- c(1e4, 79e4)
+coor6 <- c(1.8e5, 76e4)
+coor7 <- c(8e5, 60e4)
+coor8 <- c(5e5, 2.5e4)
+coor9 <- c(2.7e3, 1e4)
+
+
+# # iRFP
+coor1 <- c(385, 3.7e4)
+coor2 <- c(235, 15e4)
+coor3 <- c(335, 32e4)
+coor4 <- c(1200, 42e4)
+coor5 <- c(1e4, 52e4)
+coor6 <- c(1.8e5, 51e4)
+coor7 <- c(8e5, 35e4)
+coor8 <- c(5e5, 2.5e4)
+coor9 <- c(2.7e3, 1e4)
+
+
+# # HELA
+# coor1 <- c(885, 3.7e4)
+# coor2 <- c(735, 15e4)
+# coor3 <- c(835, 57e4)
+# coor4 <- c(1200, 67e4)
+# coor5 <- c(1e4, 79e4)
+# coor6 <- c(1.8e5, 76e4)
+# coor7 <- c(8e5, 60e4)
 # coor8 <- c(5e5, 2.5e4)
-# coor9 <- c(7.7e3, 1e4)
+# coor9 <- c(2.7e3, 1e4)
+
+
+# # # high HELA (temp)
+# coor1 <- c(80885, 3.7e4)
+# coor2 <- c(80735, 15e4)
+# coor3 <- c(80835, 57e4)
+# coor4 <- c(81200, 67e4)
+# coor5 <- c(9e4, 79e4)
+# coor6 <- c(1.8e5, 76e4)
+# coor7 <- c(8e5, 60e4)
+# coor8 <- c(5e5, 2.5e4)
+# coor9 <- c(82.7e3, 1e4)
+
+
+# # # Tetracycline autofluorescence
+coor1 <- c(5885, 3.7e4)
+coor2 <- c(5735, 15e4)
+coor3 <- c(5835, 32e4)
+coor4 <- c(6200, 42e4)
+coor5 <- c(1e4, 52e4)
+coor6 <- c(1.8e5, 51e4)
+coor7 <- c(8e5, 35e4)
+coor8 <- c(5e5, 2.5e4)
+coor9 <- c(7.7e3, 1e4)
 
 
 # # # Tetracycline autofluorescence 2
-# coor1 <- c(10885, 3.7e4)
-# coor2 <- c(10735, 15e4)
-# coor3 <- c(10835, 32e4)
-# coor4 <- c(11200, 42e4)
-# coor5 <- c(1.5e4, 52e4)
+coor1 <- c(4885, 3.7e4)
+coor2 <- c(4735, 15e4)
+coor3 <- c(4835, 32e4)
+coor4 <- c(5200, 42e4)
+coor5 <- c(1e4, 52e4)
+coor6 <- c(1.8e6, 51e4)
+coor7 <- c(1.8e6, 35e4)
+coor8 <- c(1.8e6, 2.5e4)
+coor9 <- c(7.7e3, 1e4)
+
+
+# # # Tetracycline autofluorescence 3
+coor1 <- c(10885, 3.7e4)
+coor2 <- c(10735, 15e4)
+coor3 <- c(10835, 32e4)
+coor4 <- c(11200, 42e4)
+coor5 <- c(1.5e4, 52e4)
+coor6 <- c(1.8e5, 51e4)
+coor7 <- c(8e5, 35e4)
+coor8 <- c(5e5, 2.5e4)
+coor9 <- c(12.7e3, 1e4)
+
+
+# # high expression
+coor1 <- c(1685, 3.7e4)
+coor2 <- c(1535, 15e4)
+coor3 <- c(1635, 32e4)
+coor4 <- c(2000, 62e4)
+coor5 <- c(1.5e4, 72e4)
+coor6 <- c(3.85e5, 71e4)
+coor7 <- c(10.05e5, 55e4)
+coor8 <- c(7.05e5, 2.5e4)
+coor9 <- c(7.7e3, 1e4)
+
+# 
+# # # Kehan's expression - -800
+# coor1 <- c(585, 3.7e4)
+# coor2 <- c(435, 15e4)
+# coor3 <- c(435, 32e4)
+# coor4 <- c(585, 62e4)
+# coor5 <- c(1.5e4, 72e4)
+# coor6 <- c(3.85e5, 71e4)
+# coor7 <- c(10.05e5, 55e4)
+# coor8 <- c(7.05e5, 2.5e4)
+# coor9 <- c(7.7e3, 1e4)
+# 
+# # # Kehan's stringet SSC-A gate - -800
+# coor1 <- c(585, 3.7e4)
+# coor2 <- c(435, 15e4)
+# coor3 <- c(435, 26e4)
+# coor4 <- c(585, 34e4)
+# coor5 <- c(1.5e4, 46e4)
+# coor6 <- c(3.85e5, 43e4)
+# coor7 <- c(10.05e5, 27e4)
+# coor8 <- c(7.05e5, 2.5e4)
+# coor9 <- c(7.7e3, 1e4)
+
+# # # # GFP variable autofluorescence
+# coor1 <- c(35885, 3.7e4)
+# coor2 <- c(35735, 15e4)
+# coor3 <- c(35835, 32e4)
+# coor4 <- c(35200, 42e4)
+# coor5 <- c(1e5, 52e4)
 # coor6 <- c(1.8e5, 51e4)
 # coor7 <- c(8e5, 35e4)
 # coor8 <- c(5e5, 2.5e4)
-# coor9 <- c(12700, 1e4)
+# coor9 <- c(7.7e4, 1e4)
 
-
-# # JCC_27/51 high expression
-# coor1 <- c(2685, 3.7e4)
-# coor2 <- c(2535, 15e4)
-# coor3 <- c(2635, 32e4)
-# coor4 <- c(3000, 42e4)
-# coor5 <- c(1.5e4, 52e4)
-# coor6 <- c(3.85e5, 51e4)
-# coor7 <- c(10.05e5, 35e4)
-# coor8 <- c(7.05e5, 2.5e4)
-# coor9 <- c(7.7e3, 1e4)
+# # # AF647
+coor1 <- c(25885, 3.7e4)
+coor2 <- c(25735, 15e4)
+coor3 <- c(25835, 32e4)
+coor4 <- c(26200, 42e4)
+coor5 <- c(2.8e4, 52e4)
+coor6 <- c(1.8e5, 51e4)
+coor7 <- c(8e5, 35e4)
+coor8 <- c(5e5, 2.5e4)
+coor9 <- c(27.7e3, 1e4)
 
 
 # gs_pop_remove(gs, node="BFP_pos")  ######## VARIABLE ##########
@@ -238,11 +501,18 @@ g.bfp <- polygonGate(filterId = "BFP_pos","BFP"=c(coor1[1],coor2[1],coor3[1],coo
 gs_pop_add(gs,g.bfp,parent="Singlets2") # add gate to GatingSet
 recompute(gs) # recompute GatingSet
 bfp_dots <-ggcyto(gs,aes(x=BFP,y=SSC.A),subset="Singlets2")+geom_hex(bins = 30)+geom_gate(g.bfp)+ggcyto_par_set(limits = list(x=c(1,1e6),y=c(1e4,1e6))) + facet_wrap(~name,ncol = 8) + scale_x_log10() + geom_stats(adjust = 0.8)
+bfp_dots
 
 #save plot
-pdf(file=paste(dir,"BFP_dots_gate.pdf",sep=""),width = 40,height = 40)
+pdf(file=paste(dir,"BFP_dots_gate.pdf",sep=""),width = 80,height = 50)
+# pdf(file=paste(dir,"AF647_dots_gate.pdf",sep=""),width = 80,height = 50)
 bfp_dots
 dev.off()
+
+
+
+
+
 
 
 #subset flowset to gated population
@@ -267,10 +537,6 @@ pdf(file=paste(dir,"updated_reporter_model.pdf",sep=""),width = 10,height = 10)
 final_model
 dev.off()
 # make sure the model looks right, before proceeding.
-
-
-
-
 
 
 
@@ -377,6 +643,7 @@ p2=ggplot(results,aes(x=sample,y=mCherry/BFP)) + geom_boxplot() + theme(axis.tex
 data_stats=as.data.frame(ggplot_build(p2)$data[[1]][,1:5])
 rownames(data_stats)=sort(unique(p1$data$sample))
 data_stats <- cbind(data_stats, BFP_pos, Total_counts, Singlets, Live_percent, BFP_percent)
+# bfpbin_df <- cbind(bfpbin_df, BFP_pos, Total_counts, Singlets, Live_percent, BFP_percent)
 
 data_stats <- cbind(bfpbin_df, data_stats)
 
@@ -384,3 +651,7 @@ data_stats
 
 #write csv (open in excel) file with median stats
 write.csv(data_stats,file=paste(dir,"BFP_median_stats.csv",sep=""))
+# write.csv(bfpbin_df,file=paste(dir,"BFP_median_stats.csv",sep=""))
+
+
+
